@@ -43,7 +43,7 @@ class WeatherWorker(Thread):
             Read data from the sensor (Pressure, Temperature and Humidity) from BME280
         """
         if(self.is_simulated is False):
-            from ..elements.bme280_pressure_temperature_humidity.bme280 import (
+            from elements.bme280_pressure_temperature_humidity.bme280 import (
                 readBME280All
             )
             temperature, pressure, humidity = readBME280All()
@@ -62,7 +62,7 @@ class WeatherWorker(Thread):
             Not implemented return the default constructor of Wind
         """
         if(self.is_simulated is False):
-            from ..elements.gy271_compass.gy271compass import (
+            from elements.gy271_compass.gy271compass import (
                 compass
             )
             compassSensor = compass() 
