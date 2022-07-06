@@ -17,10 +17,31 @@ from workers.weather_worker import WeatherWorker
 from modules.logger.logger import Logger
 from modules.settings.settings import Settings
 
+mainApp = None
+
+def clean_up(signal_received, frame):
+    """
+        Cleaning function at application death
+    """
+    if(mainApp is not None):
+        Logger.get_instance().info(f"Starting to stop the application signal {signal_received} received")
+        
+        mainApp.has_to_read_weather_external = False
+        
+        
+        if(mainApp.thread_read is not None):        
+            mainApp.thread_read.join(timeout=5)    
+
+        if(mainApp.weather_worker is not None):
+            mainApp.weather_worker.has_to_read_weather = False
+            mainApp.weather_worker.join(timeout=5)
+
+        Logger.get_instance().info(f"Quitting the application with status 0")
+        os.kill(os.getpid(), signal_received)
 
 class MainApp:
 
-    def __init__(self) -> None:
+    def __init__(self, async_read: bool = True) -> None:
         self.start_app()
 
         self.weather_queue = Queue(100)  # The weather queue
@@ -29,28 +50,25 @@ class MainApp:
             weather_queue=self.weather_queue,
             is_simulated=Settings.get_instance().getboolean("general", "is_simulated", False)
         )  # The weather worker
-        self.has_to_read_weather_external = True  # The
-        self.reading_thread = None
+        self.has_to_read_weather_external = True
         self.data_request = DataRequest(os.environ["API_KEY"])
+
+        self.thread_read = None
+        if(async_read is True):
+            self.thread_read = self.create_async_read()
 
         self.start_threads()
 
     def start_threads(self):
-        self.weather_worker.start()
-
-    def clean_up(self, signal_received, frame):
-        """
-            Cleaning function at application death
-        """
-
         if(self.weather_worker is not None):
-            self.weather_worker.has_to_read_weather = False
-            self.weather_worker.join(timeout=5)
+            self.weather_worker.start()
+        else:
+            Logger.get_instance().error(f"Can't start the weather worker is None")
+        
+        if(self.thread_read is not None):
+            self.thread_read.start()
 
-        self.has_to_read_weather_external = False
-
-        Logger.get_instance().info(f"Quitting the application with status 0")
-        sys.exit(0)
+    
 
     def start_app(self):
         # Default values for options
@@ -100,12 +118,7 @@ class MainApp:
         # Load settings
         Settings.get_instance().load_settings(confFileName)
 
-        # Attach signals
-        signal.signal(signal.SIGABRT, self.clean_up)
-        signal.signal(signal.SIGILL, self.clean_up)
-        signal.signal(signal.SIGINT, self.clean_up)
-        signal.signal(signal.SIGSEGV, self.clean_up)
-        signal.signal(signal.SIGTERM, self.clean_up)
+        
 
     def progress_weather_worker(self, weather: Weather) -> None:
         """
@@ -134,22 +147,39 @@ class MainApp:
                     f"Data not saved an exception occured {e}")
 
     def read_queue(self):
-        item = None
-        try:
-            item = self.weather_queue.get(block=False, timeout=5)
-            self.weather_queue.task_done()
-        except Empty:
-            Logger.get_instance().debug(f"Empty queue doing nothing")
-        except Exception as e:
-            Logger.get_instance().error(f'error while processing item {e}')
-        self.progress_weather_worker(item)
+        if(self.has_to_read_weather_external is True):
+            item = None
+            try:
+                item = self.weather_queue.get(block=False, timeout=5)
+                self.weather_queue.task_done()
+            except Empty:
+                Logger.get_instance().debug(f"Empty queue doing nothing")
+            except Exception as e:
+                Logger.get_instance().error(f'error while processing item {e}')
+            self.progress_weather_worker(item)
 
     def read_weather(self):
-        while self.has_to_read_weather_external:
+        while True:
+            if(self.has_to_read_weather_external is False):
+                Logger.get_instance().info(f"Killing the queue reading thread")
+                break
             self.read_queue()
-            sleep(1)
+            sleep(10)
 
+    def create_async_read(self):
+        return threading.Thread(target=self.read_weather)
+        
 
 if __name__ == "__main__":
-    mainApp = MainApp()
+    
+    # Attach signals
+    signal.signal(signal.SIGABRT, clean_up)
+    signal.signal(signal.SIGILL, clean_up)
+    signal.signal(signal.SIGINT, clean_up)
+    signal.signal(signal.SIGSEGV, clean_up)
+    signal.signal(signal.SIGTERM, clean_up)
+    signal.signal(2, clean_up)
+
+    mainApp = MainApp(async_read=False)
     mainApp.read_weather()
+    

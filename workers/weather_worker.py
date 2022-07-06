@@ -93,7 +93,10 @@ class WeatherWorker(Thread):
             Worker main loop
         """
         # If we ask to stop reading we have to change value of has_to_read_weather to false
-        while self.has_to_read_weather:
+        while True:
+            if(self.has_to_read_weather is False):
+                Logger.get_instance().info(f"Killing the weather thread")
+                break
             self.oneRead()
             sleep(int(self.delay_time))
 
