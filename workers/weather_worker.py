@@ -66,9 +66,15 @@ class WeatherWorker(Thread):
             from elements.gy271_compass.gy271 import (
                 compass
             )
-            compassSensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
-            angle = compassSensor.get_bearing()
+            from elements.hw477_anemometer.hw477 import (
+                anemometer
+            )
+            compass_sensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
+            angle = compass_sensor.get_bearing()
+            anemometer_sensor = anemometer(hallpin=int(os.environ["HW477_ADDRESS"]), magnetsNumber=int(os.environ["MAGNETS_NUMBER"]))
+            rotation_speed = anemometer_sensor(seconds=1)
             Logger.get_instance().debug(f"Angle : {angle}°")
+            Logger.get_instance().debug(f"Speed : {rotation_speed} tr/s")
             wind = Wind(speed=2, direction=angle)
         else:
             wind = Wind(speed=2)
