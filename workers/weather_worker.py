@@ -43,7 +43,7 @@ class WeatherWorker(Thread):
             Read data from the sensor (Pressure, Temperature and Humidity) from BME280
         """
         if(self.is_simulated is False):
-            from elements.bme280 import (
+            from ..elements.bme280_pressure_temperature_humidity.bme280 import (
                 readBME280All
             )
             temperature, pressure, humidity = readBME280All()
@@ -61,7 +61,16 @@ class WeatherWorker(Thread):
             Read data from the sensors (anemometer and wind vane)
             Not implemented return the default constructor of Wind
         """
-        wind = Wind(speed=2)
+        if(self.is_simulated is False):
+            from ..elements.gy271_compass.gy271compass import (
+                compass
+            )
+            compassSensor = compass() 
+            angle = compassSensor.get_bearing()
+            Logger.get_instance().debug(f"Angle : {angle}°")
+            wind = Wind(speed=2, direction=175)
+        else:
+            wind = Wind(speed=2)
         return wind
 
     def read_position(self):
