@@ -48,6 +48,16 @@ class MainApp:
             self.weather_worker.join(timeout=5)
 
         self.has_to_read_weather_external = False
+        
+        e = None
+        while e == None:
+            Logger.get_instance().debug(f"Emptying queue")
+            try:
+                self.weather_queue.get()
+            except Empty as empty:
+                e = empty    
+            finally:    
+                self.weather_queue.task_done()
 
         Logger.get_instance().info(f"Quitting the application with status 0")
         sys.exit(0)
