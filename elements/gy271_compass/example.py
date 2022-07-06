@@ -1,4 +1,4 @@
-import gy271compass as GY271
+import gy271 as GY271
 from time import sleep
 
 sensor = GY271.compass()

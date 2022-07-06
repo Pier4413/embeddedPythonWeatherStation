@@ -63,13 +63,13 @@ class WeatherWorker(Thread):
             Not implemented return the default constructor of Wind
         """
         if(self.is_simulated is False):
-            from elements.gy271_compass.gy271compass import (
+            from elements.gy271_compass.gy271 import (
                 compass
             )
             compassSensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
             angle = compassSensor.get_bearing()
             Logger.get_instance().debug(f"Angle : {angle}°")
-            wind = Wind(speed=2, direction=175)
+            wind = Wind(speed=2, direction=angle)
         else:
             wind = Wind(speed=2)
         return wind
