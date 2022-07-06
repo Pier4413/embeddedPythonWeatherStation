@@ -1,0 +1,6 @@
+[submodule "modules/logger"]
+	path = modules/logger
+	url = https://github.com/Pier4413/PythonSimpleLog.git
+[submodule "modules/settings"]
+	path = modules/settings
+	url = https://github.com/Pier4413/PythonSimpleSettings.git
