@@ -1,3 +1,4 @@
+import os
 from queue import Queue
 from threading import Thread
 from typing import Any
@@ -46,7 +47,7 @@ class WeatherWorker(Thread):
             from elements.bme280_pressure_temperature_humidity.bme280 import (
                 readBME280All
             )
-            temperature, pressure, humidity = readBME280All()
+            temperature, pressure, humidity = readBME280All(addr=os.environ["BME280_ADDRESS"])
         else:
             temperature = 20
             pressure = 1050
@@ -65,7 +66,7 @@ class WeatherWorker(Thread):
             from elements.gy271_compass.gy271compass import (
                 compass
             )
-            compassSensor = compass() 
+            compassSensor = compass(address=os.environ["GY271_ADDRESS"]) 
             angle = compassSensor.get_bearing()
             Logger.get_instance().debug(f"Angle : {angle}°")
             wind = Wind(speed=2, direction=175)
