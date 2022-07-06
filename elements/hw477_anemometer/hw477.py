@@ -25,4 +25,5 @@ class anemometer:
       end = time.time()
       if(gpio.input(self.hallpin) == False):
         counter = counter + 1
+      time.sleep(0.1)
     return counter/(self.magnetsNumber*seconds)
