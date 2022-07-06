@@ -1,3 +1,4 @@
+from math import pi
 import os
 from queue import Queue
 from threading import Thread
@@ -22,7 +23,7 @@ class WeatherWorker(Thread):
         :version: 1.0
     """
 
-    def __init__(self, delay_time: int = 60, weather_queue: Queue = None, is_simulated: bool = False) -> None:
+    def __init__(self, delay_time: int = 60, weather_queue: Queue = None, is_simulated: bool = False, rotation_radius: float = 0.1) -> None:
         """
             Constructor
 
@@ -38,6 +39,7 @@ class WeatherWorker(Thread):
         self.has_to_read_weather = True
         self.weather_queue = weather_queue
         self.is_simulated = is_simulated
+        self.rotation_radius = rotation_radius
 
     def read_pressure_temperature_humidity(self, wind_speed):
         """
@@ -76,7 +78,8 @@ class WeatherWorker(Thread):
             rotation_speed = anemometer_sensor.readData(seconds=1)
             Logger.get_instance().debug(f"Angle : {angle}°")
             Logger.get_instance().debug(f"Speed : {rotation_speed} tr/s")
-            wind = Wind(speed=2, direction=angle)
+            wind_speed = 2*pi*rotation_speed*self.rotation_radius
+            wind = Wind(speed=wind_speed, direction=angle)
         else:
             wind = Wind(speed=2)
         return wind

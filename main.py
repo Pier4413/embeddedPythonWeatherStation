@@ -36,7 +36,7 @@ def clean_up(signal_received, frame):
             mainApp.weather_worker.join(timeout=5)
 
         Logger.get_instance().info(f"Quitting the application with status {signal_received}")
-        os.kill(os.getpid(), signal_received)
+        os.kill(os.getpid(), 0)
 
 class MainApp:
 
@@ -47,7 +47,8 @@ class MainApp:
         self.weather_worker = WeatherWorker(
             delay_time=Settings.get_instance().getint("general", "delay", 60),
             weather_queue=self.weather_queue,
-            is_simulated=Settings.get_instance().getboolean("general", "is_simulated", False)
+            is_simulated=Settings.get_instance().getboolean("general", "is_simulated", False),
+            rotation_radius=Settings.get_instance().getfloat("anemometer", "sensor_radius", 0.1)
         )  # The weather worker
         self.has_to_read_weather_external = True
         self.data_request = DataRequest(os.environ["API_KEY"])
