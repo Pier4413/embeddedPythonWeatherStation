@@ -101,11 +101,11 @@ class MainApp:
         Settings.get_instance().load_settings(confFileName)
 
         # Attach signals
-        #signal.signal(signal.SIGABRT, self.clean_up)
-        #signal.signal(signal.SIGILL, self.clean_up)
+        signal.signal(signal.SIGABRT, self.clean_up)
+        signal.signal(signal.SIGILL, self.clean_up)
         signal.signal(signal.SIGINT, self.clean_up)
-        #signal.signal(signal.SIGSEGV, self.clean_up)
-        #signal.signal(signal.SIGTERM, self.clean_up)
+        signal.signal(signal.SIGSEGV, self.clean_up)
+        signal.signal(signal.SIGTERM, self.clean_up)
 
     def progress_weather_worker(self, weather: Weather) -> None:
         """
@@ -137,8 +137,7 @@ class MainApp:
         if(self.weather_queue.empty() is not True):
             item = self.weather_queue.get()
             try:
-                threadData = threading.Thread(target=self.progress_weather_worker, args=(item,))
-                threadData.start()
+                self.progress_weather_worker(item)
             except Empty:
                 Logger.get_instance().debug(f"Empty queue doing nothing")
             except Exception as e:
