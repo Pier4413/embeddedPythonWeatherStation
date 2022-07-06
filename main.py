@@ -48,16 +48,6 @@ class MainApp:
             self.weather_worker.join(timeout=5)
 
         self.has_to_read_weather_external = False
-        
-        e = None
-        while e == None:
-            Logger.get_instance().debug(f"Emptying queue")
-            try:
-                self.weather_queue.get()
-            except Empty as empty:
-                e = empty    
-            finally:    
-                self.weather_queue.task_done()
 
         Logger.get_instance().info(f"Quitting the application with status 0")
         sys.exit(0)
@@ -144,16 +134,15 @@ class MainApp:
                     f"Data not saved an exception occured {e}")
 
     def read_queue(self):
-        if(self.weather_queue.empty() is not True):
-            item = self.weather_queue.get()
-            try:
-                self.progress_weather_worker(item)
-            except Empty:
-                Logger.get_instance().debug(f"Empty queue doing nothing")
-            except Exception as e:
-                Logger.get_instance().error(f'error while processing item {e}')
-            finally:
-                self.weather_queue.task_done()
+        item = None
+        try:
+            item = self.weather_queue.get(block=False, timeout=5)
+            self.weather_queue.task_done()
+        except Empty:
+            Logger.get_instance().debug(f"Empty queue doing nothing")
+        except Exception as e:
+            Logger.get_instance().error(f'error while processing item {e}')
+        self.progress_weather_worker(item)
 
     def read_weather(self):
         while self.has_to_read_weather_external:
