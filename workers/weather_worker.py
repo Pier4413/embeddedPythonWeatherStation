@@ -47,7 +47,7 @@ class WeatherWorker(Thread):
             from elements.bme280_pressure_temperature_humidity.bme280 import (
                 readBME280All
             )
-            temperature, pressure, humidity = readBME280All(addr=os.environ["BME280_ADDRESS"])
+            temperature, pressure, humidity = readBME280All(addr=int(os.environ["BME280_ADDRESS"], 16))
         else:
             temperature = 20
             pressure = 1050
@@ -66,7 +66,7 @@ class WeatherWorker(Thread):
             from elements.gy271_compass.gy271compass import (
                 compass
             )
-            compassSensor = compass(address=os.environ["GY271_ADDRESS"]) 
+            compassSensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
             angle = compassSensor.get_bearing()
             Logger.get_instance().debug(f"Angle : {angle}°")
             wind = Wind(speed=2, direction=175)
