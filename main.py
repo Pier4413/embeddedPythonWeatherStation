@@ -28,19 +28,16 @@ def clean_up(signal_received, frame):
 
         mainApp.has_to_read_weather_external = False
 
-        if(mainApp.thread_read is not None):
-            mainApp.thread_read.join(timeout=5)
-
         if(mainApp.weather_worker is not None):
             mainApp.weather_worker.has_to_read_weather = False
             mainApp.weather_worker.join(timeout=5)
 
-        Logger.get_instance().info(f"Quitting the application with status {signal_received}")
+        Logger.get_instance().info(f"Quitting the application with status 0")
         os.kill(os.getpid(), 0)
 
 class MainApp:
 
-    def __init__(self, async_read: bool = True) -> None:
+    def __init__(self) -> None:
         self.start_app()
 
         self.weather_queue = Queue(100)  # The weather queue
@@ -53,10 +50,6 @@ class MainApp:
         self.has_to_read_weather_external = True
         self.data_request = DataRequest(os.environ["API_KEY"])
 
-        self.thread_read = None
-        if(async_read is True):
-            self.thread_read = self.create_async_read()
-
         self.start_threads()
 
     def start_threads(self):
@@ -64,11 +57,7 @@ class MainApp:
             self.weather_worker.start()
         else:
             Logger.get_instance().error(f"Can't start the weather worker is None")
-
-        if(self.thread_read is not None):
-            self.thread_read.start()
-
-    
+   
 
     def start_app(self):
         # Default values for options
@@ -165,10 +154,7 @@ class MainApp:
                 break
             self.read_queue()
             sleep(10)
-
-    def create_async_read(self):
-        return threading.Thread(target=self.read_weather)
-        
+       
 
 if __name__ == "__main__":
     
@@ -180,6 +166,6 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, clean_up)
     #signal.signal(2, clean_up)
 
-    mainApp = MainApp(async_read=False)
+    mainApp = MainApp()
     mainApp.read_weather()
     
