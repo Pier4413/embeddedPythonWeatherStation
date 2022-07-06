@@ -48,6 +48,7 @@ class WeatherWorker(Thread):
                 readBME280All
             )
             temperature, pressure, humidity = readBME280All(addr=int(os.environ["BME280_ADDRESS"], 16))
+            Logger.get_instance().debug(f"BME280 : {temperature}, {pressure}, {humidity}")
         else:
             temperature = 20
             pressure = 1050

@@ -3,10 +3,10 @@ import time
 
 class anemometer:
 
-  def __init__(self, hallpin: int = 2, magnetsNumber: int = 4) -> None:
+  def __init__(self, hallpin: int = 12, magnetsNumber: int = 4) -> None:
     self.hallpin = hallpin
     self.magnetsNumber = magnetsNumber
-    gpio.setmode(gpio.BCM)
+    gpio.setmode(gpio.BOARD)
     gpio.setwarnings(False)
     gpio.setup(self.hallpin, gpio.IN)
 
@@ -20,7 +20,8 @@ class anemometer:
     start = time.time()
     end = time.time()
     counter = 0
-    while start - end < seconds:
+    print(f"{start} {end}")
+    while((end - start) < seconds):
       end = time.time()
       if(gpio.input(self.hallpin) == False):
         counter = counter + 1

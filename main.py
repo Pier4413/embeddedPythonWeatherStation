@@ -25,18 +25,17 @@ def clean_up(signal_received, frame):
     """
     if(mainApp is not None):
         Logger.get_instance().info(f"Starting to stop the application signal {signal_received} received")
-        
+
         mainApp.has_to_read_weather_external = False
-        
-        
-        if(mainApp.thread_read is not None):        
-            mainApp.thread_read.join(timeout=5)    
+
+        if(mainApp.thread_read is not None):
+            mainApp.thread_read.join(timeout=5)
 
         if(mainApp.weather_worker is not None):
             mainApp.weather_worker.has_to_read_weather = False
             mainApp.weather_worker.join(timeout=5)
 
-        Logger.get_instance().info(f"Quitting the application with status 0")
+        Logger.get_instance().info(f"Quitting the application with status {signal_received}")
         os.kill(os.getpid(), signal_received)
 
 class MainApp:
@@ -64,7 +63,7 @@ class MainApp:
             self.weather_worker.start()
         else:
             Logger.get_instance().error(f"Can't start the weather worker is None")
-        
+
         if(self.thread_read is not None):
             self.thread_read.start()
 
@@ -178,7 +177,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, clean_up)
     signal.signal(signal.SIGSEGV, clean_up)
     signal.signal(signal.SIGTERM, clean_up)
-    signal.signal(2, clean_up)
+    #signal.signal(2, clean_up)
 
     mainApp = MainApp(async_read=False)
     mainApp.read_weather()
