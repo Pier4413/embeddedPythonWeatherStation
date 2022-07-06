@@ -122,7 +122,7 @@ class MainApp:
 
             try:
                 response = self.data_request.makeRequest(
-                    uri=os.env["API_SERVER_URL"],
+                    uri=os.environ["API_SERVER_URL"],
                     url="weather",
                     params=weather.__dict__(),
                     methodHTTP="POST"
