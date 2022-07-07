@@ -1,9 +1,11 @@
 from math import pi
 import os
 from queue import Queue
+import queue
 from threading import Thread
 from typing import Any
 from time import sleep
+from modules.settings.settings import Settings
 
 from modules.logger.logger import Logger
 
@@ -23,23 +25,18 @@ class WeatherWorker(Thread):
         :version: 1.0
     """
 
-    def __init__(self, delay_time: int = 60, weather_queue: Queue = None, is_simulated: bool = False, rotation_radius: float = 0.1) -> None:
+    def __init__(self, weather_queue: Queue = None) -> None:
         """
             Constructor
 
-            :param delay_time: The time between two reads in seconds
-            :type delay_time: int
             :param weather_queue: The queue in which we put the data
             :type weather_queue: Queue
-            :param is_simulated: To allow use to simulated data without the sensors
-            :type is_simulated: bool
         """
         super().__init__()
-        self.delay_time = delay_time
+        self.delay_time = Settings.get_instance().getint("general", "delay", 300)
         self.has_to_read_weather = True
         self.weather_queue = weather_queue
-        self.is_simulated = is_simulated
-        self.rotation_radius = rotation_radius
+        self.is_simulated = Settings.get_instance().getboolean("general", "is_simulated", False)
 
     def read_pressure_temperature_humidity(self, wind_speed):
         """
@@ -74,11 +71,16 @@ class WeatherWorker(Thread):
             )
             compass_sensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
             angle = compass_sensor.get_bearing()
-            anemometer_sensor = anemometer(hallpin=int(os.environ["HW477_ADDRESS"]), magnetsNumber=int(os.environ["MAGNETS_NUMBER"]))
-            rotation_speed = anemometer_sensor.readData(seconds=10)
+            anemometer_sensor = anemometer(
+                hallpin=int(os.environ["HW477_ADDRESS"]), 
+                magnetsNumber=Settings.get_instance().getint("anemometer", "magnets", 4),
+                step_time=Settings.get_instance().getfloat("anemometer", "step_time", 0.1), 
+                reading_time=Settings.get_instance().getfloat("anemometer", "delay", 10.0)
+            )
+            rotation_speed = anemometer_sensor.readData()
             Logger.get_instance().debug(f"Angle : {angle}°")
             Logger.get_instance().debug(f"Speed : {rotation_speed} tr/s")
-            wind_speed = 2*pi*rotation_speed*self.rotation_radius
+            wind_speed = 2*pi*rotation_speed*Settings.get_instance().getfloat("anemometer", "sensor_radius", 0.1)
             wind = Wind(speed=wind_speed, direction=angle)
         else:
             wind = Wind(speed=2)
@@ -114,5 +116,11 @@ class WeatherWorker(Thread):
             weather = Weather(wind=wind, position=position,
                               misc=misc, temperature=temp)
 
-            if(self.weather_queue is not None and self.weather_queue.full() is not True):
-                self.weather_queue.put(weather)
+            try:
+                self.weather_queue.put(item=weather,timeout=5)
+            except queue.Full:
+                Logger.get_instance().debug(f"Queue is full")
+            except Exception as e:
+                Logger.get_instance().error(f"Error on weather worker queue : {e}")
+            finally:
+                Logger.get_instance().debug(f"Data has been added to the queue")

@@ -42,10 +42,7 @@ class MainApp:
 
         self.weather_queue = Queue(100)  # The weather queue
         self.weather_worker = WeatherWorker(
-            delay_time=Settings.get_instance().getint("general", "delay", 60),
-            weather_queue=self.weather_queue,
-            is_simulated=Settings.get_instance().getboolean("general", "is_simulated", False),
-            rotation_radius=Settings.get_instance().getfloat("anemometer", "sensor_radius", 0.1)
+            weather_queue=self.weather_queue
         )  # The weather worker
         self.has_to_read_weather_external = True
         self.data_request = DataRequest(os.environ["API_KEY"])
@@ -58,22 +55,33 @@ class MainApp:
         else:
             Logger.get_instance().error(f"Can't start the weather worker is None")
    
+    def print_help(self):
+        file1 = open("Readme.md", "r")
+        print(file1.readlines())
+        clean_up(0, 0)
+
+    def check_environ(self, *args):
+        for k in args:
+            if(os.getenv(k) is None):
+                Logger.get_instance().error(f"{k} environment variable doesn't exists please provide it or see ReadMe")
+                clean_up(0, 0)
 
     def start_app(self):
+
         # Default values for options
         confFileName = "./conf/settings.ini"
         envFileName = "./conf/.env"
-        logInfo = "./logs/info.log"
-        logCritical = "./logs/critical.log"
+        logInfo = None
+        logCritical = None
+        logConsole = False
         logLevel = 20
 
         # Process command line options
         try:
-            opts, args = getopt.getopt(sys.argv[1:], "", [
-                                       "settings=", "env=", "log_level=", "log_info_file=", "log_crit_file="])
+            opts, args = getopt.getopt(sys.argv[1:], "", ["settings=", "env=", "log_level=", "log_info_file=", "log_crit_file=", "log_console=", "help"])
         except Exception as e:
             print(f"{e}")
-            self.clean_up(0, 0)
+            clean_up(0, 0)
 
         for opt, arg in opts:
             if opt in ['-s', "--settings"]:
@@ -86,15 +94,21 @@ class MainApp:
                 logInfo = arg
             elif opt in ["--log_crit_file"]:
                 logCritical = arg
+            elif opt in ["--log_console"]:
+                logConsole = arg
+            elif opt in ["--help"]:
+                self.print_help()
             else:
                 print(f"Option not handled {opt}")
 
         # Logger loading
-        Logger.get_instance().load_logger(info_file=logInfo,
-                                          critical_file=logCritical, console=True, level=logLevel)
+        Logger.get_instance().load_logger(app_name="Weather station", info_file=logInfo,
+                                          critical_file=logCritical, console=logConsole, level=logLevel)
 
         # Dot env file
         load_dotenv(envFileName)
+        
+        self.check_environ()
 
         # Printing options for debug purposes in the logger (i.e in files and console if wanted)
         Logger.get_instance().info(f"Given options : ")
@@ -106,8 +120,6 @@ class MainApp:
 
         # Load settings
         Settings.get_instance().load_settings(confFileName)
-
-        
 
     def progress_weather_worker(self, weather: Weather) -> None:
         """

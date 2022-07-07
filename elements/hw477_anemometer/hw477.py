@@ -3,14 +3,16 @@ import time
 
 class anemometer:
 
-  def __init__(self, hallpin: int = 12, magnetsNumber: int = 4) -> None:
+  def __init__(self, hallpin: int = 12, magnetsNumber: int = 4, step_time: float = 0.1, reading_time: float = 10) -> None:
     self.hallpin = hallpin
     self.magnetsNumber = magnetsNumber
+    self.step_time = step_time
+    self.reading_time = reading_time
     gpio.setmode(gpio.BOARD)
     gpio.setwarnings(False)
     gpio.setup(self.hallpin, gpio.IN)
 
-  def readData(self, seconds: int = 10) -> int:
+  def readData(self) -> int:
     """
       Read the numbers of passing through the sensors and send back the speed of magnets with the number of magnets
 
@@ -21,9 +23,9 @@ class anemometer:
     end = time.time()
     counter = 0
     print(f"{start} {end}")
-    while((end - start) < seconds):
+    while((end - start) < self.reading_time):
       end = time.time()
       if(gpio.input(self.hallpin) == False):
         counter = counter + 1
-      time.sleep(0.1)
-    return counter/(self.magnetsNumber*seconds)
+      time.sleep(self.step_time)
+    return counter/(self.magnetsNumber*self.reading_time)
