@@ -40,7 +40,7 @@ class MainApp:
     def __init__(self) -> None:
         
         self.has_to_read_weather_external = True
-        
+
         self.start_app()
 
         self.weather_queue = Queue(100)  # The weather queue
@@ -107,7 +107,7 @@ class MainApp:
             elif opt in ["--log_crit_file"]:
                 logCritical = arg
             elif opt in ["--log_console"]:
-                logConsole = arg
+                logConsole = bool(arg)
             elif opt in ["--help"]:
                 self.print_help()
             else:
