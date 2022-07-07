@@ -56,9 +56,11 @@ class MainApp:
             Logger.get_instance().error(f"Can't start the weather worker is None")
    
     def print_help(self):
-        file1 = open("Readme.md", "r")
-        print(file1.readlines())
-        clean_up(0, 0)
+        with(open("README.md", "r") as file):
+                import mistletoe
+                renderer = mistletoe.markdown(file)
+                print(renderer)
+                clean_up(0, 0)
 
     def check_environ(self, *args):
         for k in args:
