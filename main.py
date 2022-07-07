@@ -38,29 +38,39 @@ def clean_up(signal_received, frame):
 class MainApp:
 
     def __init__(self) -> None:
+        
+        self.has_to_read_weather_external = True
+        
         self.start_app()
 
         self.weather_queue = Queue(100)  # The weather queue
         self.weather_worker = WeatherWorker(
             weather_queue=self.weather_queue
         )  # The weather worker
-        self.has_to_read_weather_external = True
         self.data_request = DataRequest(os.environ["API_KEY"])
 
         self.start_threads()
 
     def start_threads(self):
-        if(self.weather_worker is not None):
+        if(self.weather_worker is not None and self.has_to_read_weather_external is True):
             self.weather_worker.start()
         else:
             Logger.get_instance().error(f"Can't start the weather worker is None")
    
     def print_help(self):
-        with(open("README.md", "r") as file):
-                import mistletoe
-                renderer = mistletoe.markdown(file)
-                print(renderer)
-                clean_up(0, 0)
+        self.has_to_read_weather_external = False
+        print("- --help : print the help\n"+
+            "- --settings : providing the path of the ini config file (default : ./conf/settings.ini)\n"+
+            "- --env : providing the path of a .env file (default : ./conf/.env)\n"+
+            "- --log_level : The log level. A lower level include the higher ones\n"+
+            "\t- DEBUG : 10\n"+
+            "\t- INFO : 20\n"+
+            "\t- WARN : 30\n"+
+            "\t- ERROR : 40\n"+
+            "- --log_info_file : To log all infos (default : None)\n"+
+            "- --log_crit_file : To log error infos (default : None)\n"+
+            "- --log_console : To log all infos in the console (default : 0)\n")
+        clean_up(0, 0)
 
     def check_environ(self, *args):
         for k in args:
