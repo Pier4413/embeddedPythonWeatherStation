@@ -22,7 +22,6 @@ class anemometer:
     start = time.time()
     end = time.time()
     counter = 0
-    print(f"{start} {end}")
     while((end - start) < self.reading_time):
       end = time.time()
       if(gpio.input(self.hallpin) == False):
