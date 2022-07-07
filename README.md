@@ -3,8 +3,8 @@
 This part is in python and is intended to work with sensors
 
 See : 
- - https://github.com/Pier4413/dataServerWeatherStation
- - https://github.com/Pier4413/webInterfaceWeatherStation.git
+ - [Data Server (Node.js/Mongo.db)](https://github.com/Pier4413/dataServerWeatherStation)
+ - [Web Interface (Vue.js)](https://github.com/Pier4413/webInterfaceWeatherStation.git)
 
 ## Config file
 
