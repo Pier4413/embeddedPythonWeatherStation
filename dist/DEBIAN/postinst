@@ -1,5 +1,8 @@
 #!/bin/bash
 
-pip install -r requirements.txt
+pip install -r /opt/weather-station/requirements.txt
+pip install -r /opt/weather-station/embedded.txt
 systemctl enable weather-station
-systemctl start weather-station
+echo "You shall set your parameters in /etc/default/weather-station.env, in particular API_KEY and API_SERVER_URL"
+echo "Once you have set your parameters you should launch the commands"
+echo "systemctl start weather-station"

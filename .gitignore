@@ -2,3 +2,8 @@ conf/
 __pycache__
 .vscode
 logs/
+dist/**/*.py
+dist/**/*.txt
+dist/**/elements
+dist/**/modules
+*.deb

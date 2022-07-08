@@ -2,12 +2,11 @@
 Description=The Weather station service
 
 [Service]
-Type=forking
+Type=simple
 PIDFile=/run/weather-station.pid
 EnvironmentFile=/etc/default/weather-station.env
-ExecStartPre=cd /opt/weather-station
-ExecStart=python main.py --settings=${SETTINGS_FILE} --env=${ENV_FILE} --log_info_file=${LOG_INFO} --log_crit_file=${LOG_CRIT_FILE}
-ExecStop=/bin/kill -s QUIT $MAINPID
+ExecStart=/usr/bin/python3 /opt/weather-station/main.py --settings=${SETTINGS_FILE} --env=${ENV_FILE} --log_info_file=${LOG_INFO} --log_crit_file=${LOG_CRIT_FILE}
+ExecStop=/bin/kill -9 $MAINPID
 PrivateTmp=true
 
 [Install]
