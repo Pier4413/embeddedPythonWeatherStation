@@ -1,0 +1,6 @@
+Package: WeatherStation
+Version: 1.0.0
+Architecture: armhf
+Maintainer: Panda<panda@delmasweb.net>
+Depends: python3 (>=3.9) python3-pip
+Description: This is the embedded part of the weather station project

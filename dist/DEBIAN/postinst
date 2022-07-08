@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pip install -r requirements.txt
+systemctl enable weather-station
+systemctl start weather-station
