@@ -22,4 +22,4 @@ jobs:
         python -m pip install -r requirements-devel.txt
     - name: Tests
       run: |
-        pytest .
+        python -m pytest tests
