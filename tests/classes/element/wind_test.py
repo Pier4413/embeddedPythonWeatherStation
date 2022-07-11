@@ -23,28 +23,28 @@ class WindTest(unittest.TestCase):
             This function test speed
         """
         self.wind.speed = 10
-        self.assertEquals(self.wind.speed, 10, "Should be 10")
+        self.assertEqual(self.wind.speed, 10, "Should be 10")
 
     def test_direction_value_ok(self):
         """
             This function test direction
         """
         self.wind.direction = 10
-        self.assertEquals(self.wind.direction, 10, "Should be 10")
+        self.assertEqual(self.wind.direction, 10, "Should be 10")
 
     def test_direction_value_up_360(self):
         """
             This function test direction if the value is up 360°, should return the value - 360
         """
         self.wind.direction = 460
-        self.assertEquals(self.wind.direction, 100, "Should be 100")
+        self.assertEqual(self.wind.direction, 100, "Should be 100")
 
     def test_direction_value_down_0(self):
         """
             This function test direction if the value is below 360°, should return the value + 360
         """
         self.wind.direction = -50
-        self.assertEquals(self.wind.direction, 310, "Should be 310")
+        self.assertEqual(self.wind.direction, 310, "Should be 310")
 
     @data(0, 45, 90, 135, 180, 225, 270, 315)
     def test_convert_direction_degrees_to_string(self, value):
@@ -53,21 +53,21 @@ class WindTest(unittest.TestCase):
         """
         result = Wind.convertDirectionDegreesInDirectionString(value)
         if(value == 0):
-            self.assertEquals(result, "n", "Should return n")
+            self.assertEqual(result, "n", "Should return n")
         elif(value == 45):
-            self.assertEquals(result, "ne", "Should return ne")
+            self.assertEqual(result, "ne", "Should return ne")
         elif(value == 90):
-            self.assertEquals(result, "e", "Should return e")
+            self.assertEqual(result, "e", "Should return e")
         elif(value == 135):
-            self.assertEquals(result, "se", "Should return se")
+            self.assertEqual(result, "se", "Should return se")
         elif(value == 180):
-            self.assertEquals(result, "s", "Should return s")
+            self.assertEqual(result, "s", "Should return s")
         elif(value == 225):
-            self.assertEquals(result, "sw", "Should return sw")
+            self.assertEqual(result, "sw", "Should return sw")
         elif(value == 270):
-            self.assertEquals(result, "w", "Should return w")
+            self.assertEqual(result, "w", "Should return w")
         elif(value == 315):
-            self.assertEquals(result, "nw", "Should return nw")
+            self.assertEqual(result, "nw", "Should return nw")
         else:
             self.assertTrue(False)
 
@@ -75,4 +75,4 @@ class WindTest(unittest.TestCase):
         """
             This function test to convert in m/s to km/h
         """
-        self.assertEquals(Wind.convertSpeedFromMeterSecondsToKilometersHours(5), 18, "Should return 18")
+        self.assertEqual(Wind.convertSpeedFromMeterSecondsToKilometersHours(5), 18, "Should return 18")

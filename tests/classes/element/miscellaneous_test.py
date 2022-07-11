@@ -22,19 +22,19 @@ class TestMiscellaneous(unittest.TestCase):
             Test for set and get pressure
         """
         self.misc.pressure = 10
-        self.assertEquals(self.misc.pressure, 10, "Should be 10")
+        self.assertEqual(self.misc.pressure, 10, "Should be 10")
 
     def test_humidity(self):
         """
             Test for set and get humidity
         """
         self.misc.humidity = 10
-        self.assertEquals(self.misc.humidity, 10, "Should be 10")
+        self.assertEqual(self.misc.humidity, 10, "Should be 10")
     
     def test_to_string(self):
         """
             Test for string reduction of the Misc class
         """
-        self.assertEquals(self.misc.__str__(), "Pressure : [-1], Humidity : [-1], Sunrise : [-1], Sunset : [-1]")
+        self.assertEqual(self.misc.__str__(), "Pressure : [-1], Humidity : [-1]")
 
    
