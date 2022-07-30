@@ -1,5 +1,5 @@
 Package: weather-station
-Version: 1.0.0
+Version: 1.0.2
 Architecture: arm64
 Maintainer: Panda<panda@delmasweb.net>
 Pre-Depends: python3(>=3.9), python3-pip

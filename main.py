@@ -141,7 +141,7 @@ class MainApp:
             :type weather: Weather
         """
         if weather == None:
-            Logger.get_instance().error("No weather provided")
+            Logger.get_instance().debug("No weather provided")
         else:
             # Print the weather to debug for information
             Logger.get_instance().debug(weather)
