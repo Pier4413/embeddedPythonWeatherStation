@@ -43,10 +43,14 @@ class WeatherWorker(Thread):
             Read data from the sensor (Pressure, Temperature and Humidity) from BME280
         """
         if(self.is_simulated is False):
-            from elements.bme280_pressure_temperature_humidity.bme280 import (
-                readBME280All
-            )
-            temperature, pressure, humidity = readBME280All(addr=int(os.environ["BME280_ADDRESS"], 16))
+            temperature=0
+            pressure=0
+            humidity=0
+            if(Settings.get_instance().getboolean("bme280", "has_to_read", False) is True):
+                from elements.bme280_pressure_temperature_humidity.bme280 import (
+                    readBME280All
+                )
+                temperature, pressure, humidity = readBME280All(addr=int(os.environ["BME280_ADDRESS"], 16))
             Logger.get_instance().debug(f"BME280 : {temperature}, {pressure}, {humidity}")
         else:
             temperature = 20
@@ -63,21 +67,25 @@ class WeatherWorker(Thread):
             Not implemented return the default constructor of Wind
         """
         if(self.is_simulated is False):
-            from elements.gy271_compass.gy271 import (
-                compass
-            )
-            from elements.hw477_anemometer.hw477 import (
-                anemometer
-            )
-            compass_sensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
-            angle = compass_sensor.get_bearing()
-            anemometer_sensor = anemometer(
-                hallpin=int(os.environ["HW477_ADDRESS"]), 
-                magnetsNumber=Settings.get_instance().getint("anemometer", "magnets", 4),
-                step_time=Settings.get_instance().getfloat("anemometer", "step_time", 0.1), 
-                reading_time=Settings.get_instance().getfloat("anemometer", "delay", 10.0)
-            )
-            rotation_speed = anemometer_sensor.readData()
+            angle=0
+            rotation_speed=0
+            if(Settings.get_instance().getboolean("gy271", "has_to_read", False) is True):
+                from elements.gy271_compass.gy271 import (
+                    compass
+                )
+                compass_sensor = compass(address=int(os.environ["GY271_ADDRESS"], 16))
+                angle = compass_sensor.get_bearing()
+            if(Settings.get_instance().getboolean("hw477", "has_to_read", False) is True):
+                from elements.hw477_anemometer.hw477 import (
+                    anemometer
+                )
+                anemometer_sensor = anemometer(
+                    hallpin=int(os.environ["HW477_ADDRESS"]), 
+                    magnetsNumber=Settings.get_instance().getint("anemometer", "magnets", 4),
+                    step_time=Settings.get_instance().getfloat("anemometer", "step_time", 0.1), 
+                    reading_time=Settings.get_instance().getfloat("anemometer", "delay", 10.0)
+                )
+                rotation_speed = anemometer_sensor.readData()
             Logger.get_instance().debug(f"Angle : {angle}°")
             Logger.get_instance().debug(f"Speed : {rotation_speed} tr/s")
             wind_speed = 2*pi*rotation_speed*Settings.get_instance().getfloat("anemometer", "sensor_radius", 0.1)
