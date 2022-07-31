@@ -33,15 +33,19 @@ The ini config file can contains to parametrized the application, those values h
 delay = 300 # Used to delay the read of sensors
 is_simulated = False # Used in dev to simulated the sensors
 
-[anemometer]
-magnets = 4 # The number of magnets on one turn of the anemometer
-step_time = 0.1 # A time to pause the read of the sensor to avoid reading multiple times the same passage
-delay = 10 # The given time to read the anemometer
-sensor_radius = 0.1 # The radius on which the sensor is placed from the center of the anemometer
+[bme280]
+has_to_read=true
+
+[gy271]
+has_to_read=true
+
+[hw477]
+has_to_read=true
 ```
 
 If you copy from here don't forget to delete the comments at the end of the lines
 
+Each has to read is for the sensors. If has_to_read the default values of the sensors will be 0.
 ## .env file
 
 The .env file is not necessary as values of this file are read has environment variables they can be provided by other means (like in the shell directly)
@@ -50,3 +54,7 @@ However whatever the mean this two variables have to be sets :
 
   - API_KEY : The api key to connect to data server
   - API_SERVER_URL : The fully qualified URL of the server (i.e with protocol (http or https) and port)
+  - BME280_ADDRESS : The address of the BME280 for pressure, humidity and temperature
+  - GY271_ADDRESS : The address of the GY271 for the compass
+  - HW477_ADDRESS : The address of the HW477 hall effect sensor
+  - MAGNETS_NUMBER : The number of magnets used in the anemometer
